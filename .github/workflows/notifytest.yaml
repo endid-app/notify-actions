@@ -11,26 +11,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: rtCamp/action-slack-notify@v2
+      if: always()
+      name: 'slack-notify'
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_LEGACY_WEBHOOK_URL }}
 
-  action-slack:
-    name: 'action-slack'
-    runs-on: ubuntu-latest
-    steps:
     - uses: 8398a7/action-slack@v3
+      name: 'action-slack'
+      if: always()
       with:
         status: ${{ job.status }}
         # fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }} # required
 
-  slack-send-bot:
-    name: 'slack-send-bot'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Post to a Slack channel by Bot
-      id: slack
+
+    - name: 'slack-send-bot'
+      if: always()
       uses: slackapi/slack-github-action@v1.22.0
       with:
         # Slack channel id, channel name, or user id to post message.
@@ -42,12 +39,8 @@ jobs:
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-  slack-send-webhook:
-    name: 'slack-send-webhook'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Post to a Slack channel WebHook
-      id: slack
+    - name: 'slack-send-webhook'
+      if: always()      
       uses: slackapi/slack-github-action@v1.22.0
       with:
         # Slack channel id, channel name, or user id to post message.
@@ -70,11 +63,8 @@ jobs:
         SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
 
-  post-slack-message:
-    name: 'post-slack-message'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Notify slack
+    - name: 'post-slack-message'
+      if: always()
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       uses: pullreminders/slack-action@master
@@ -82,11 +72,8 @@ jobs:
         args: '{\"channel\":\"C01FJA0NVJ8\",\"text\":\"Hello world\"}'
 
 
-  github-action-for-slack:
-    name: 'github-action-for-slack'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Slack notification
+    - name: 'github-action-for-slack'
+      if: always()
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
         SLACK_USERNAME: github-action-for-slack # Optional. (defaults to webhook app)
@@ -96,11 +83,8 @@ jobs:
       #with:
       #  args: 'A new commit has been pushed.' # Optional
 
-  slack-notify-build:
-    name: 'slack-notify-build'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Notify slack success
+    - name: 'slack-notify-build'
+      if: always()
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       uses: voxmedia/github-action-slack-notify-build@v1
