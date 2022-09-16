@@ -14,7 +14,8 @@ jobs:
       if: always()
       name: 'slack-notify'
       env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_LEGACY_WEBHOOK_URL }}
+        #SLACK_WEBHOOK: ${{ secrets.SLACK_LEGACY_WEBHOOK_URL }}
+        SLACK_WEBHOOK: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
 
     - uses: 8398a7/action-slack@v3
       name: 'action-slack'
