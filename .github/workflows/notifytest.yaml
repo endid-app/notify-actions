@@ -80,8 +80,20 @@ jobs:
         #SLACK_CHANNEL: general # Optional. (defaults to webhook)
         SLACK_AVATAR: repository # Optional. can be (repository, sender, an URL) (defaults to webhook app avatar)
       uses: Ilshidur/action-slack@2.0.2
-      #with:
-      #  args: 'A new commit has been pushed.' # Optional
+      with:
+        args:  |
+          {
+            "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                }
+              }
+            ]
+          }
 
     - name: 'slack-notify-build'
       if: always()
@@ -89,6 +101,6 @@ jobs:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       uses: voxmedia/github-action-slack-notify-build@v1
       with:
-        channel: app-alerts
+        channel: 'C01FJA0NVJ8'
         status: SUCCESS
         color: good
