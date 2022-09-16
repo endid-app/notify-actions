@@ -1,0 +1,74 @@
+name: "Notify Tests"
+
+on:
+  push:
+  workflow_dispatch:
+  
+jobs:
+
+  slack-notify:
+    name: 'slack-notify'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_LEGACY_WEBHOOK_URL }}
+
+  action-slack:
+    name: 'action-slack'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        # fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }} # required
+
+  slack-send-bot:
+    name: 'slack-send-bot'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Post to a Slack channel by Bot
+      id: slack
+      uses: slackapi/slack-github-action@v1.22.0
+      with:
+        # Slack channel id, channel name, or user id to post message.
+        # See also: https://api.slack.com/methods/chat.postMessage#channels
+        # You can pass in multiple channels to post to by providing a comma-delimited list of channel IDs.
+        channel-id: 'C01FJA0NVJ8'
+        # For posting a simple plain text message
+        slack-message: "GitHub build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+  slack-send-webhook:
+    name: 'slack-send-webhook'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Post to a Slack channel WebHook
+      id: slack
+      uses: slackapi/slack-github-action@v1.22.0
+      with:
+        # Slack channel id, channel name, or user id to post message.
+        # See also: https://api.slack.com/methods/chat.postMessage#channels
+        # You can pass in multiple channels to post to by providing a comma-delimited list of channel IDs.
+        # channel-id: 'C01FJA0NVJ8'
+        # For posting a simple plain text message
+        slack-message: "GitHub build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_INCOMING_WEBHOOK_URL }}
+        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+
+  post-slack-message:
+    name: 'post-slack-message'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify slack
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: pullreminders/slack-action@master
+      with:
+        args: '{\"channel\":\"C01FJA0NVJ8\",\"text\":\"Hello world\"}'
+        
